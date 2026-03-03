@@ -5,7 +5,7 @@ import {
   useWallet,
   useSendTransaction,
   useConnectModal,
-  useAccountModal,
+  useProfileModal,
 } from '@vechain/vechain-kit';
 import { useQueryClient } from '@tanstack/react-query';
 import { TokenPicker } from './TokenPicker';
@@ -56,7 +56,7 @@ function shortAddress(addr: string) {
 export function DisperseApp() {
   const { account, connection, disconnect } = useWallet();
   const { open: openConnect } = useConnectModal();
-  const { open: openAccount } = useAccountModal();
+  const { open: openProfile } = useProfileModal();
   const queryClient = useQueryClient();
 
   const [mode, setMode] = useState<Mode>('vet');
@@ -197,7 +197,7 @@ export function DisperseApp() {
           <span className="network">{networkType === 'test' ? 'testnet' : 'mainnet'}</span>
           <button
             className="address"
-            onClick={() => openAccount()}
+            onClick={() => openProfile()}
             type="button"
             style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}
           >

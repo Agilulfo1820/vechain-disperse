@@ -546,9 +546,49 @@
   background: rgba(0, 0, 0, 0.2);
 }
 
-/* ----- vechain kit modal hover (theme prop doesn't support hoverBg) ----- */
+/* ----- vechain kit modal overrides ----- */
 
+/* remove all rounded corners */
+.chakra-modal__content,
+.chakra-modal__content div,
+.chakra-modal__content button,
+.chakra-modal__content [role="button"],
+.chakra-modal__content input {
+  border-radius: 0 !important;
+}
+
+/* background consistency */
+.chakra-modal__content {
+  background-color: #f5f3ef !important;
+}
+
+/* typography */
+.chakra-modal__content,
+.chakra-modal__content p,
+.chakra-modal__content span,
+.chakra-modal__content button,
+.chakra-modal__content h2,
+.chakra-modal__content h3,
+.chakra-modal__content h4 {
+  font-family: 'Playfair Display', serif !important;
+  color: #1a1a1a !important;
+}
+
+/* section labels (RISORSE etc) */
+.chakra-modal__content p[class*="heading"],
+.chakra-modal__content span[class*="label"] {
+  text-transform: lowercase !important;
+  letter-spacing: 0.04em !important;
+}
+
+/* hover */
 .chakra-modal__content button:hover,
 .chakra-modal__content [role="button"]:hover {
   background-color: #7dd3c7 !important;
+}
+
+/* borders: subtle, consistent */
+.chakra-modal__content button,
+.chakra-modal__content [role="button"] {
+  border: 1px solid #ddd !important;
 }
