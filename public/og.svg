@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+  <rect width="1200" height="630" fill="#f5f3ef"/>
+  <path d="M540 200L590 250L540 300L490 250Z" fill="#7dd3c7"/>
+  <path d="M540 215L575 250L540 285L505 250Z" fill="#1a1a1a"/>
+  <text x="600" y="260" font-family="serif" font-size="72" font-weight="400" fill="#1a1a1a" text-anchor="start" dominant-baseline="middle">disperse</text>
+  <text x="600" y="320" font-family="serif" font-size="24" font-style="italic" fill="#666" text-anchor="start">distribute vet or tokens to multiple addresses</text>
+  <text x="600" y="370" font-family="monospace" font-size="18" fill="#999" text-anchor="start">powered by vechain multi-clause transactions</text>
+</svg>
