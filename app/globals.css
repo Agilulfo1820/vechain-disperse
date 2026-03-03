@@ -70,10 +70,14 @@
 
 .tagline {
   font-family: 'Playfair Display', serif;
-  font-style: italic;
   font-size: 1.1rem;
   color: #666;
   text-transform: lowercase;
+}
+
+.dict-label {
+  font-style: italic;
+  font-weight: 700;
 }
 
 .wallet-info {
@@ -466,7 +470,6 @@
 
 .connect-tagline {
   font-family: 'Playfair Display', serif;
-  font-style: italic;
   font-size: 1.4rem;
   color: #666;
   text-transform: lowercase;

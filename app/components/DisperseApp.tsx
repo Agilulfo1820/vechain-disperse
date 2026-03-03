@@ -154,7 +154,7 @@ export function DisperseApp() {
               <h1>disperse</h1>
             </div>
             <p className="connect-tagline">
-              <em>verb</em> distribute vet or tokens to multiple addresses
+              <span className="dict-label">verb</span> distribute vet or tokens to multiple addresses
             </p>
             <h2 className="connect-heading">connect wallet to get started</h2>
             <button className="connect-button" onClick={() => openConnect()} type="button">
@@ -189,7 +189,7 @@ export function DisperseApp() {
             <h1>disperse</h1>
           </div>
           <p className="tagline">
-            <em>verb</em> distribute vet or tokens to multiple addresses
+            <span className="dict-label">verb</span> distribute vet or tokens to multiple addresses
           </p>
         </div>
 
