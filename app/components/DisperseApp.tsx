@@ -15,10 +15,36 @@ import { isVetDomain } from '../lib/parse';
 import { ERC20_TRANSFER_ABI, getNetworkType } from '../lib/constants';
 import type { Token, Mode } from '../lib/types';
 
-function DiamondIcon() {
+function DandelionIcon() {
   return (
-    <svg width="28" height="28" viewBox="0 0 16 16" fill="currentColor">
-      <path d="M8 0L16 8L8 16L0 8Z" />
+    <svg width="56" height="56" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+      {/* stem */}
+      <line x1="14" y1="28" x2="14" y2="14" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />
+      {/* center */}
+      <circle cx="14" cy="13" r="1.2" fill="currentColor" />
+      {/* seed stalks */}
+      <line x1="14" y1="13" x2="14" y2="5" stroke="currentColor" strokeWidth="0.6" strokeLinecap="round" />
+      <line x1="14" y1="13" x2="8" y2="7" stroke="currentColor" strokeWidth="0.6" strokeLinecap="round" />
+      <line x1="14" y1="13" x2="20" y2="7" stroke="currentColor" strokeWidth="0.6" strokeLinecap="round" />
+      <line x1="14" y1="13" x2="6" y2="12" stroke="currentColor" strokeWidth="0.6" strokeLinecap="round" />
+      <line x1="14" y1="13" x2="22" y2="11" stroke="currentColor" strokeWidth="0.6" strokeLinecap="round" />
+      <line x1="14" y1="13" x2="10" y2="17" stroke="currentColor" strokeWidth="0.6" strokeLinecap="round" />
+      <line x1="14" y1="13" x2="18" y2="17" stroke="currentColor" strokeWidth="0.6" strokeLinecap="round" />
+      {/* seed tips */}
+      <circle cx="14" cy="5" r="0.8" fill="currentColor" />
+      <circle cx="8" cy="7" r="0.8" fill="currentColor" />
+      <circle cx="20" cy="7" r="0.8" fill="currentColor" />
+      <circle cx="6" cy="12" r="0.8" fill="currentColor" />
+      <circle cx="22" cy="11" r="0.8" fill="currentColor" />
+      {/* floating seeds */}
+      <g fill="#7dd3c7" stroke="#7dd3c7" strokeWidth="0.4">
+        <circle cx="25" cy="5" r="0.7" />
+        <line x1="25" y1="5" x2="23" y2="7" strokeLinecap="round" />
+        <circle cx="28" cy="9" r="0.6" />
+        <line x1="28" y1="9" x2="26.5" y2="11" strokeLinecap="round" />
+        <circle cx="26" cy="15" r="0.5" />
+        <line x1="26" y1="15" x2="24.5" y2="16.5" strokeLinecap="round" />
+      </g>
     </svg>
   );
 }
@@ -123,7 +149,7 @@ export function DisperseApp() {
       <div className="page-wrapper">
         <div style={{ textAlign: 'center', marginBottom: '1rem' }}>
           <div className="logo-row" style={{ justifyContent: 'center' }}>
-            <DiamondIcon />
+            <DandelionIcon />
             <h1 style={{ fontFamily: "'Playfair Display', serif", fontWeight: 400, fontSize: '1.75rem', textTransform: 'lowercase' as const }}>
               disperse
             </h1>
@@ -162,7 +188,7 @@ export function DisperseApp() {
       <div className="header">
         <div className="header-left">
           <div className="logo-row">
-            <DiamondIcon />
+            <DandelionIcon />
             <h1>disperse</h1>
           </div>
           <p className="tagline">
