@@ -3,7 +3,7 @@ import { Providers } from './providers';
 import './globals.css';
 
 export const metadata: Metadata = {
-  title: 'disperse',
+  title: 'Disperse on VeChain',
   description:
     'Send VET or ERC-20 tokens to multiple addresses in a single transaction on VeChain.',
   icons: {
@@ -13,22 +13,22 @@ export const metadata: Metadata = {
     apple: '/icon.svg',
   },
   openGraph: {
-    title: 'disperse',
+    title: 'Disperse on VeChain',
     description:
       'Distribute VET or tokens to multiple addresses in one transaction. Powered by VeChain multi-clause.',
-    siteName: 'disperse',
+    siteName: 'Disperse on VeChain',
     type: 'website',
     locale: 'en_US',
   },
   twitter: {
     card: 'summary',
-    title: 'disperse',
+    title: 'Disperse on VeChain',
     description:
       'Distribute VET or tokens to multiple addresses in one transaction. Powered by VeChain multi-clause.',
   },
   metadataBase: new URL('https://disperse.me'),
   keywords: ['vechain', 'disperse', 'multi-send', 'batch transfer', 'VET', 'token', 'multi-clause'],
-  applicationName: 'disperse',
+  applicationName: 'Disperse on VeChain',
   authors: [{ name: 'disperse.me' }],
 };
 
