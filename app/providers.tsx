@@ -58,16 +58,7 @@ export function Providers({ children }: { children: ReactNode }) {
           fonts: { family: "'Playfair Display', serif" },
         }}
         dappKit={{
-          allowedWallets: ['veworld', 'sync2', 'wallet-connect'],
-          walletConnectOptions: {
-            projectId: process.env.NEXT_PUBLIC_WC_PROJECT_ID ?? '',
-            metadata: {
-              name: 'disperse',
-              description: 'distribute vet or tokens to multiple addresses',
-              url: typeof window !== 'undefined' ? window.location.origin : '',
-              icons: [],
-            },
-          },
+          allowedWallets: ['veworld'],
         }}
       >
         {children}
