@@ -445,30 +445,54 @@
 
 .connect-screen {
   display: flex;
-  flex-direction: column;
   align-items: center;
-  padding-top: 6rem;
-  gap: 2rem;
+  justify-content: center;
+  min-height: 80vh;
 }
 
-.connect-screen h2 {
+.connect-inner {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.connect-inner .logo-row {
+  gap: 0.75rem;
+}
+
+.connect-inner h1 {
+  font-size: 3.5rem;
+}
+
+.connect-tagline {
+  font-family: 'Playfair Display', serif;
+  font-style: italic;
+  font-size: 1.4rem;
+  color: #666;
+  text-transform: lowercase;
+  margin-top: 0.75rem;
+}
+
+.connect-heading {
   font-family: 'Playfair Display', serif;
   font-weight: 400;
-  font-size: 1.75rem;
+  font-size: 2rem;
   text-transform: lowercase;
   font-style: italic;
+  margin-top: 3rem;
 }
 
 .connect-button {
   background: none;
   border: 1px solid #1a1a1a;
   color: #1a1a1a;
-  padding: 0.75rem 2.5rem;
+  padding: 1rem 3.5rem;
   font-family: 'Playfair Display', serif;
-  font-size: 1.1rem;
+  font-size: 1.35rem;
   cursor: pointer;
   text-transform: lowercase;
   transition: background 0.15s;
+  margin-top: 1.5rem;
 }
 
 .connect-button:hover {

@@ -147,23 +147,20 @@ export function DisperseApp() {
   if (!isConnected) {
     return (
       <div className="page-wrapper">
-        <div style={{ textAlign: 'center', marginBottom: '1rem' }}>
-          <div className="logo-row" style={{ justifyContent: 'center' }}>
-            <DandelionIcon />
-            <h1 style={{ fontFamily: "'Playfair Display', serif", fontWeight: 400, fontSize: '1.75rem', textTransform: 'lowercase' as const }}>
-              disperse
-            </h1>
-          </div>
-          <p className="tagline" style={{ marginTop: '0.5rem' }}>
-            <em>verb</em> distribute vet or tokens to multiple addresses
-          </p>
-        </div>
-
         <div className="connect-screen">
-          <h2>connect wallet</h2>
-          <button className="connect-button" onClick={() => openConnect()} type="button">
-            connect
-          </button>
+          <div className="connect-inner">
+            <div className="logo-row">
+              <DandelionIcon />
+              <h1>disperse</h1>
+            </div>
+            <p className="connect-tagline">
+              <em>verb</em> distribute vet or tokens to multiple addresses
+            </p>
+            <h2 className="connect-heading">connect wallet to get started</h2>
+            <button className="connect-button" onClick={() => openConnect()} type="button">
+              connect
+            </button>
+          </div>
         </div>
       </div>
     );
@@ -204,7 +201,7 @@ export function DisperseApp() {
             type="button"
             style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}
           >
-            {shortAddress(address!)}
+            {address ? shortAddress(address) : ''}
           </button>
           <button
             className="disconnect-link"
