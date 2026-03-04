@@ -1,0 +1,10 @@
+{
+  "version": 1,
+  "skills": {
+    "vechain-dev": {
+      "source": "vechain/vechain-ai-skills",
+      "sourceType": "github",
+      "computedHash": "e01be00b96f7b3876cee06c14be3cb7a301aa69bc3488281db5fb07bac160035"
+    }
+  }
+}
