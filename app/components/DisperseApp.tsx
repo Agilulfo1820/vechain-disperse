@@ -15,12 +15,6 @@ import { isVetDomain } from '../lib/parse';
 import { ERC20_TRANSFER_ABI, getNetworkType } from '../lib/constants';
 import type { Token, Mode } from '../lib/types';
 
-function DandelionIcon() {
-  return (
-    <img src="/logo-disperse.png" alt="disperse" width="84" height="84" style={{ objectFit: 'contain' }} />
-  );
-}
-
 function shortAddress(addr: string) {
   return `${addr.slice(0, 6)}…${addr.slice(-4)}`;
 }
@@ -121,10 +115,7 @@ export function DisperseApp() {
       <div className="page-wrapper">
         <div className="connect-screen">
           <div className="connect-inner">
-            <div className="logo-row">
-              <DandelionIcon />
-              <h1>disperse</h1>
-            </div>
+            <h1>disperse</h1>
             <p className="connect-tagline">
               <span className="dict-label">verb</span> distribute vet or tokens to multiple addresses
             </p>
