@@ -1,19 +1,29 @@
-'use client';
+"use client";
 
-import { useState, useMemo, useCallback } from 'react';
+import { useState, useMemo, useCallback } from "react";
 import {
   useWallet,
   useSendTransaction,
   useConnectModal,
   useProfileModal,
-} from '@vechain/vechain-kit';
-import { useQueryClient } from '@tanstack/react-query';
-import { TokenPicker } from './TokenPicker';
-import { parseInput, parseAmountToWei, formatWei, encodeERC20Transfer } from '../lib/parse';
-import { useVetBalance, useTokenBalance, useTokenRegistry, useResolveDomains } from '../lib/hooks';
-import { isVetDomain } from '../lib/parse';
-import { ERC20_TRANSFER_ABI, getNetworkType } from '../lib/constants';
-import type { Token, Mode } from '../lib/types';
+} from "@vechain/vechain-kit";
+import { useQueryClient } from "@tanstack/react-query";
+import { TokenPicker } from "./TokenPicker";
+import {
+  parseInput,
+  parseAmountToWei,
+  formatWei,
+  encodeERC20Transfer,
+} from "../lib/parse";
+import {
+  useVetBalance,
+  useTokenBalance,
+  useTokenRegistry,
+  useResolveDomains,
+} from "../lib/hooks";
+import { isVetDomain } from "../lib/parse";
+import { ERC20_TRANSFER_ABI, getNetworkType } from "../lib/constants";
+import type { Token, Mode } from "../lib/types";
 
 function shortAddress(addr: string) {
   return `${addr.slice(0, 6)}…${addr.slice(-4)}`;
@@ -25,20 +35,19 @@ export function DisperseApp() {
   const { open: openProfile } = useProfileModal();
   const queryClient = useQueryClient();
 
-  const [mode, setMode] = useState<Mode>('vet');
+  const [mode, setMode] = useState<Mode>("vet");
   const [selectedToken, setSelectedToken] = useState<Token | null>(null);
-  const [inputText, setInputText] = useState('');
+  const [inputText, setInputText] = useState("");
 
   const isConnected = connection?.isConnected;
   const address = account?.address;
   const networkType = getNetworkType();
 
   // balances
-  const { data: vetBalance, isLoading: vetBalanceLoading } = useVetBalance(address);
-  const { data: tokenBalance, isLoading: tokenBalanceLoading } = useTokenBalance(
-    address,
-    selectedToken?.address,
-  );
+  const { data: vetBalance, isLoading: vetBalanceLoading } =
+    useVetBalance(address);
+  const { data: tokenBalance, isLoading: tokenBalanceLoading } =
+    useTokenBalance(address, selectedToken?.address);
 
   // token registry
   const { data: tokens = [], isLoading: tokensLoading } = useTokenRegistry();
@@ -47,12 +56,14 @@ export function DisperseApp() {
   const parsed = useMemo(() => parseInput(inputText), [inputText]);
 
   // resolve .vet domains to 0x addresses
-  const { resolvedEntries, domainMap, unresolved, isResolving } =
-    useResolveDomains(parsed.entries);
+  const { resolvedEntries, unresolved, isResolving } = useResolveDomains(
+    parsed.entries,
+  );
 
   // calculate totals
-  const decimals = mode === 'vet' ? 18 : (selectedToken?.decimals ?? 18);
-  const symbol = mode === 'vet' ? 'vet' : (selectedToken?.symbol?.toLowerCase() ?? 'token');
+  const decimals = mode === "vet" ? 18 : (selectedToken?.decimals ?? 18);
+  const symbol =
+    mode === "vet" ? "vet" : (selectedToken?.symbol?.toLowerCase() ?? "token");
 
   const totalWei = useMemo(() => {
     return resolvedEntries.reduce((sum, entry) => {
@@ -64,10 +75,11 @@ export function DisperseApp() {
     }, 0n);
   }, [resolvedEntries, decimals]);
 
-  const balance = mode === 'vet' ? (vetBalance ?? 0n) : (tokenBalance ?? 0n);
+  const balance = mode === "vet" ? (vetBalance ?? 0n) : (tokenBalance ?? 0n);
   const remaining = balance - totalWei;
   const insufficientFunds = resolvedEntries.length > 0 && remaining < 0n;
-  const balanceLoading = mode === 'vet' ? vetBalanceLoading : tokenBalanceLoading;
+  const balanceLoading =
+    mode === "vet" ? vetBalanceLoading : tokenBalanceLoading;
 
   // transaction
   const {
@@ -77,37 +89,51 @@ export function DisperseApp() {
     resetStatus,
     isTransactionPending,
   } = useSendTransaction({
-    signerAccountAddress: address ?? '',
+    signerAccountAddress: address ?? "",
     onTxConfirmed: () => {
-      queryClient.invalidateQueries({ queryKey: ['vet-balance'] });
-      queryClient.invalidateQueries({ queryKey: ['token-balance'] });
+      queryClient.invalidateQueries({ queryKey: ["vet-balance"] });
+      queryClient.invalidateQueries({ queryKey: ["token-balance"] });
     },
   });
 
   const handleDisperse = useCallback(async () => {
-    if (resolvedEntries.length === 0 || insufficientFunds || isTransactionPending || unresolved.length > 0) return;
+    if (
+      resolvedEntries.length === 0 ||
+      insufficientFunds ||
+      isTransactionPending ||
+      unresolved.length > 0
+    )
+      return;
 
     const clauses =
-      mode === 'vet'
+      mode === "vet"
         ? resolvedEntries.map((e) => ({
             to: e.address,
-            value: '0x' + parseAmountToWei(e.amount, 18).toString(16),
-            data: '0x',
-            comment: `send ${e.amount} vet to ${e.input !== e.address ? e.input + ' ' : ''}${shortAddress(e.address)}`,
+            value: "0x" + parseAmountToWei(e.amount, 18).toString(16),
+            data: "0x",
+            comment: `send ${e.amount} vet to ${e.input !== e.address ? e.input + " " : ""}${shortAddress(e.address)}`,
           }))
         : resolvedEntries.map((e) => ({
             to: selectedToken!.address,
-            value: '0x0',
+            value: "0x0",
             data: encodeERC20Transfer(
               e.address,
               parseAmountToWei(e.amount, selectedToken!.decimals),
             ),
-            comment: `send ${e.amount} ${selectedToken!.symbol} to ${e.input !== e.address ? e.input + ' ' : ''}${shortAddress(e.address)}`,
+            comment: `send ${e.amount} ${selectedToken!.symbol} to ${e.input !== e.address ? e.input + " " : ""}${shortAddress(e.address)}`,
             abi: ERC20_TRANSFER_ABI,
           }));
 
     await sendTransaction(clauses);
-  }, [resolvedEntries, insufficientFunds, isTransactionPending, unresolved, mode, selectedToken, sendTransaction]);
+  }, [
+    resolvedEntries,
+    insufficientFunds,
+    isTransactionPending,
+    unresolved,
+    mode,
+    selectedToken,
+    sendTransaction,
+  ]);
 
   // ---------- connect screen ----------
   if (!isConnected) {
@@ -117,10 +143,15 @@ export function DisperseApp() {
           <div className="connect-inner">
             <h1>disperse</h1>
             <p className="connect-tagline">
-              <span className="dict-label">verb</span> distribute vet or tokens to multiple addresses
+              <span className="dict-label">verb</span> distribute vet or tokens
+              to multiple addresses
             </p>
             <h2 className="connect-heading">connect wallet to get started</h2>
-            <button className="connect-button" onClick={() => openConnect()} type="button">
+            <button
+              className="connect-button"
+              onClick={() => openConnect()}
+              type="button"
+            >
               connect
             </button>
           </div>
@@ -131,7 +162,9 @@ export function DisperseApp() {
 
   // ---------- main form ----------
   const explorerBase =
-    networkType === 'test' ? 'https://explore-testnet.vechain.org' : 'https://explore.vechain.org';
+    networkType === "test"
+      ? "https://explore-testnet.vechain.org"
+      : "https://explore.vechain.org";
 
   const canSubmit =
     resolvedEntries.length > 0 &&
@@ -140,7 +173,7 @@ export function DisperseApp() {
     !isResolving &&
     unresolved.length === 0 &&
     parsed.errors.length === 0 &&
-    (mode === 'vet' || selectedToken !== null);
+    (mode === "vet" || selectedToken !== null);
 
   return (
     <div className="page-wrapper">
@@ -148,23 +181,30 @@ export function DisperseApp() {
       <div className="header">
         <div className="header-left">
           <div className="logo-row">
-            <DandelionIcon />
             <h1>disperse</h1>
           </div>
           <p className="tagline">
-            <span className="dict-label">verb</span> distribute vet or tokens to multiple addresses
+            <span className="dict-label">verb</span> distribute vet or tokens to
+            multiple addresses
           </p>
         </div>
 
         <div className="wallet-info">
-          <span className="network">{networkType === 'test' ? 'testnet' : 'mainnet'}</span>
+          <span className="network">
+            {networkType === "test" ? "testnet" : "mainnet"}
+          </span>
           <button
             className="address"
             onClick={() => openProfile()}
             type="button"
-            style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}
+            style={{
+              background: "none",
+              border: "none",
+              cursor: "pointer",
+              padding: 0,
+            }}
           >
-            {address ? shortAddress(address) : ''}
+            {address ? shortAddress(address) : ""}
           </button>
           <button
             className="disconnect-link"
@@ -180,16 +220,19 @@ export function DisperseApp() {
       <div className="mode-selector">
         <span>send </span>
         <button
-          className={`mode-option ${mode === 'vet' ? 'active' : ''}`}
-          onClick={() => { setMode('vet'); setSelectedToken(null); }}
+          className={`mode-option ${mode === "vet" ? "active" : ""}`}
+          onClick={() => {
+            setMode("vet");
+            setSelectedToken(null);
+          }}
           type="button"
         >
           vet
         </button>
         <span> or </span>
         <button
-          className={`mode-option ${mode === 'token' ? 'active' : ''}`}
-          onClick={() => setMode('token')}
+          className={`mode-option ${mode === "token" ? "active" : ""}`}
+          onClick={() => setMode("token")}
           type="button"
         >
           token
@@ -197,7 +240,7 @@ export function DisperseApp() {
       </div>
 
       {/* token picker */}
-      {mode === 'token' && (
+      {mode === "token" && (
         <TokenPicker
           tokens={tokens}
           selected={selectedToken}
@@ -210,10 +253,7 @@ export function DisperseApp() {
       <div className="balance-line">
         <span>you have </span>
         <span className="balance-value">
-          {balanceLoading
-            ? '…'
-            : formatWei(balance, decimals)}{' '}
-          {symbol}
+          {balanceLoading ? "…" : formatWei(balance, decimals)} {symbol}
         </span>
         {!balanceLoading && balance === 0n && (
           <span className="hint"> (make sure to add funds)</span>
@@ -224,7 +264,8 @@ export function DisperseApp() {
       <div className="input-section">
         <p className="section-title">recipients and amounts</p>
         <p className="section-subtitle">
-          enter one address (or .vet domain) and amount in {symbol} on each line. supports any format.
+          enter one address (or .vet domain) and amount in {symbol} on each
+          line. supports any format.
         </p>
         <textarea
           className="input-textarea"
@@ -232,7 +273,7 @@ export function DisperseApp() {
           value={inputText}
           onChange={(e) => {
             setInputText(e.target.value);
-            if (status !== 'ready') resetStatus();
+            if (status !== "ready") resetStatus();
           }}
           spellCheck={false}
         />
@@ -251,7 +292,10 @@ export function DisperseApp() {
 
       {/* domain resolution status */}
       {isResolving && parsed.entries.some((e) => isVetDomain(e.address)) && (
-        <div className="tx-status pending" style={{ marginBottom: '1rem', marginTop: 0 }}>
+        <div
+          className="tx-status pending"
+          style={{ marginBottom: "1rem", marginTop: 0 }}
+        >
           resolving .vet domains…
         </div>
       )}
@@ -272,7 +316,7 @@ export function DisperseApp() {
             <thead>
               <tr>
                 <th>address</th>
-                <th style={{ textAlign: 'right' }}>amount</th>
+                <th style={{ textAlign: "right" }}>amount</th>
               </tr>
             </thead>
             <tbody>
@@ -281,11 +325,18 @@ export function DisperseApp() {
                   <td className="address-cell">
                     {entry.input !== entry.address ? (
                       <span>
-                        <span style={{ color: '#1a1a1a', fontFamily: "'Playfair Display', serif", fontStyle: 'italic' }}>
+                        <span
+                          style={{
+                            color: "#1a1a1a",
+                            fontFamily: "'Playfair Display', serif",
+                            fontStyle: "italic",
+                          }}
+                        >
                           {entry.input}
+                        </span>{" "}
+                        <span style={{ color: "#999" }}>
+                          {shortAddress(entry.address)}
                         </span>
-                        {' '}
-                        <span style={{ color: '#999' }}>{shortAddress(entry.address)}</span>
                       </span>
                     ) : (
                       shortAddress(entry.address)
@@ -309,13 +360,13 @@ export function DisperseApp() {
             <div className="row">
               <span className="label">your balance</span>
               <span className="value">
-                {balanceLoading ? '…' : formatWei(balance, decimals)} {symbol}
+                {balanceLoading ? "…" : formatWei(balance, decimals)} {symbol}
               </span>
             </div>
-            <div className={`row ${insufficientFunds ? 'negative' : ''}`}>
+            <div className={`row ${insufficientFunds ? "negative" : ""}`}>
               <span className="label">remaining</span>
               <span className="value">
-                {balanceLoading ? '…' : formatWei(remaining, decimals)} {symbol}
+                {balanceLoading ? "…" : formatWei(remaining, decimals)} {symbol}
               </span>
             </div>
           </div>
@@ -333,17 +384,18 @@ export function DisperseApp() {
         onClick={handleDisperse}
         type="button"
       >
-        {isTransactionPending ? 'dispersing…' : 'disperse'}
+        {isTransactionPending ? "dispersing…" : "disperse"}
       </button>
 
       {/* tx status */}
-      {status === 'success' && txReceipt && (
+      {status === "success" && txReceipt && (
         <div className="tx-status success">
-          done.{' '}
+          done.{" "}
           {(() => {
             const receipt = txReceipt as unknown as Record<string, unknown>;
             const meta = receipt.meta as Record<string, string> | undefined;
-            const txId = meta?.txID ?? (receipt.txId as string) ?? (receipt.id as string);
+            const txId =
+              meta?.txID ?? (receipt.txId as string) ?? (receipt.id as string);
             if (!txId) return null;
             return (
               <a
@@ -357,14 +409,16 @@ export function DisperseApp() {
           })()}
         </div>
       )}
-      {status === 'error' && (
+      {status === "error" && (
         <div className="tx-status error">
           transaction failed. please try again.
         </div>
       )}
-      {(status === 'pending' || status === 'waitingConfirmation') && (
+      {(status === "pending" || status === "waitingConfirmation") && (
         <div className="tx-status pending">
-          {status === 'pending' ? 'sending transaction…' : 'waiting for confirmation…'}
+          {status === "pending"
+            ? "sending transaction…"
+            : "waiting for confirmation…"}
         </div>
       )}
     </div>
