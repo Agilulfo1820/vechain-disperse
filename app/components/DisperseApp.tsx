@@ -29,6 +29,14 @@ function shortAddress(addr: string) {
   return `${addr.slice(0, 6)}…${addr.slice(-4)}`;
 }
 
+const TIP_ADDRESS = "0x4fb56d105eaa40b0e45e847b84555587929d4b1a";
+
+const TIP_PRESETS = [
+  { label: "50 vet", amount: "50" },
+  { label: "100 vet", amount: "100" },
+  { label: "500 vet", amount: "500" },
+];
+
 export function DisperseApp() {
   const { account, connection, disconnect } = useWallet();
   const { open: openConnect } = useConnectModal();
@@ -38,6 +46,7 @@ export function DisperseApp() {
   const [mode, setMode] = useState<Mode>("vet");
   const [selectedToken, setSelectedToken] = useState<Token | null>(null);
   const [inputText, setInputText] = useState("");
+  const [tipAmount, setTipAmount] = useState("");
 
   const isConnected = connection?.isConnected;
   const address = account?.address;
@@ -93,8 +102,44 @@ export function DisperseApp() {
     onTxConfirmed: () => {
       queryClient.invalidateQueries({ queryKey: ["vet-balance"] });
       queryClient.invalidateQueries({ queryKey: ["token-balance"] });
+      if (typeof window !== "undefined" && typeof window.gtag === "function") {
+        window.gtag("event", "disperse_success", {
+          token_type: mode,
+          token_symbol: symbol,
+          recipient_count: resolvedEntries.length,
+        });
+      }
     },
   });
+
+  // tip transaction
+  const {
+    sendTransaction: sendTip,
+    status: tipStatus,
+    txReceipt: tipReceipt,
+    resetStatus: resetTipStatus,
+    isTransactionPending: isTipPending,
+  } = useSendTransaction({
+    signerAccountAddress: address ?? "",
+    onTxConfirmed: () => {
+      queryClient.invalidateQueries({ queryKey: ["vet-balance"] });
+    },
+  });
+
+  const handleTip = useCallback(async () => {
+    if (!tipAmount || isTipPending) return;
+    const weiValue = parseAmountToWei(tipAmount, 18);
+    if (weiValue <= 0n) return;
+
+    await sendTip([
+      {
+        to: TIP_ADDRESS,
+        value: "0x" + weiValue.toString(16),
+        data: "0x",
+        comment: `tip ${tipAmount} vet to disperse`,
+      },
+    ]);
+  }, [tipAmount, isTipPending, sendTip]);
 
   const handleDisperse = useCallback(async () => {
     if (
@@ -409,6 +454,84 @@ export function DisperseApp() {
           })()}
         </div>
       )}
+      {/* tip section */}
+      {status === "success" && txReceipt && (
+        <div className="tip-section">
+          <p className="tip-heading">found this useful?</p>
+          <p className="tip-subtitle">leave a tip to support the project</p>
+
+          <div className="tip-presets">
+            {TIP_PRESETS.map((preset) => (
+              <button
+                key={preset.amount}
+                className={`tip-preset ${tipAmount === preset.amount ? "active" : ""}`}
+                onClick={() => {
+                  setTipAmount(preset.amount);
+                  if (tipStatus !== "ready") resetTipStatus();
+                }}
+                type="button"
+              >
+                {preset.label}
+              </button>
+            ))}
+            <div className="tip-custom">
+              <input
+                type="text"
+                className="tip-input"
+                placeholder="custom"
+                value={TIP_PRESETS.some((p) => p.amount === tipAmount) ? "" : tipAmount}
+                onChange={(e) => {
+                  setTipAmount(e.target.value);
+                  if (tipStatus !== "ready") resetTipStatus();
+                }}
+                onFocus={() => {
+                  if (TIP_PRESETS.some((p) => p.amount === tipAmount)) {
+                    setTipAmount("");
+                  }
+                }}
+              />
+              <span className="tip-input-suffix">vet</span>
+            </div>
+          </div>
+
+          <button
+            className="tip-button"
+            disabled={!tipAmount || isTipPending || tipStatus === "success"}
+            onClick={handleTip}
+            type="button"
+          >
+            {isTipPending ? "sending…" : tipStatus === "success" ? "thank you!" : "send tip"}
+          </button>
+
+          {tipStatus === "success" && tipReceipt && (
+            <div className="tx-status success" style={{ marginTop: "0.75rem" }}>
+              tip sent.{" "}
+              {(() => {
+                const receipt = tipReceipt as unknown as Record<string, unknown>;
+                const meta = receipt.meta as Record<string, string> | undefined;
+                const txId =
+                  meta?.txID ?? (receipt.txId as string) ?? (receipt.id as string);
+                if (!txId) return null;
+                return (
+                  <a
+                    href={`${explorerBase}/transactions/${txId}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    view transaction ↗
+                  </a>
+                );
+              })()}
+            </div>
+          )}
+          {tipStatus === "error" && (
+            <div className="tx-status error" style={{ marginTop: "0.75rem" }}>
+              tip failed. please try again.
+            </div>
+          )}
+        </div>
+      )}
+
       {status === "error" && (
         <div className="tx-status error">
           transaction failed. please try again.
